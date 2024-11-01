@@ -6,9 +6,9 @@ Copy code
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Gallery</title>
+  <title>Simple Calculator</title>
   <style>
-    /* Basic styling for the gallery layout */
+    /* Calculator styling */
     body {
       display: flex;
       justify-content: center;
@@ -18,117 +18,148 @@ Copy code
       font-family: Arial, sans-serif;
       background-color: #f0f0f0;
     }
-    .gallery-container {
-      width: 80%;
-      max-width: 700px;
-      position: relative;
-    }
-    .gallery-image {
-      width: 100%;
-      height: auto;
+    .calculator {
+      width: 300px;
+      background-color: #333;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      padding: 20px;
     }
-    .gallery-buttons {
-      display: flex;
-      justify-content: space-between;
-      position: absolute;
-      top: 50%;
+    .display {
       width: 100%;
-      transform: translateY(-50%);
+      height: 60px;
+      background-color: #222;
+      color: #fff;
+      text-align: right;
+      font-size: 24px;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
     }
-    .gallery-buttons button {
-      background-color: rgba(0, 0, 0, 0.5);
-      border: none;
-      color: white;
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .button {
+      width: 100%;
+      padding: 20px;
       font-size: 18px;
-      padding: 8px 16px;
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.3s;
     }
-    .gallery-buttons button:hover {
-      background-color: rgba(0, 0, 0, 0.7);
+    .button:hover {
+      background-color: #777;
     }
-    .thumbnail-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
+    .button.operation {
+      background-color: #ff9500;
     }
-    .thumbnail {
-      width: 60px;
-      height: 60px;
-      margin: 5px;
-      cursor: pointer;
-      opacity: 0.6;
-      border-radius: 4px;
-    }
-    .thumbnail.active {
-      border: 2px solid #007bff;
-      opacity: 1;
+    .button.operation:hover {
+      background-color: #ffb64d;
     }
   </style>
 </head>
 <body>
 
-<div class="gallery-container">
-  <img id="mainImage" class="gallery-image" src="https://via.placeholder.com/700x400?text=Image+1" alt="Gallery Image">
-
-  <div class="gallery-buttons">
-    <button onclick="prevImage()">❮ Prev</button>
-    <button onclick="nextImage()">Next ❯</button>
-  </div>
-
-  <div class="thumbnail-container">
-    <img class="thumbnail active" src="https://via.placeholder.com/700x400?text=Image+1" onclick="setImage(0)">
-    <img class="thumbnail" src="https://via.placeholder.com/700x400?text=Image+2" onclick="setImage(1)">
-    <img class="thumbnail" src="https://via.placeholder.com/700x400?text=Image+3" onclick="setImage(2)">
-    <img class="thumbnail" src="https://via.placeholder.com/700x400?text=Image+4" onclick="setImage(3)">
-    <img class="thumbnail" src="https://via.placeholder.com/700x400?text=Image+5" onclick="setImage(4)">
+<div class="calculator">
+  <div id="display" class="display">0</div>
+  <div class="buttons">
+    <button class="button" onclick="clearDisplay()">C</button>
+    <button class="button" onclick="appendNumber('%')">%</button>
+    <button class="button" onclick="appendOperator('/')">÷</button>
+    <button class="button operation" onclick="appendOperator('*')">×</button>
+    
+    <button class="button" onclick="appendNumber('7')">7</button>
+    <button class="button" onclick="appendNumber('8')">8</button>
+    <button class="button" onclick="appendNumber('9')">9</button>
+    <button class="button operation" onclick="appendOperator('-')">−</button>
+    
+    <button class="button" onclick="appendNumber('4')">4</button>
+    <button class="button" onclick="appendNumber('5')">5</button>
+    <button class="button" onclick="appendNumber('6')">6</button>
+    <button class="button operation" onclick="appendOperator('+')">+</button>
+    
+    <button class="button" onclick="appendNumber('1')">1</button>
+    <button class="button" onclick="appendNumber('2')">2</button>
+    <button class="button" onclick="appendNumber('3')">3</button>
+    <button class="button operation" onclick="calculate()">=</button>
+    
+    <button class="button" onclick="appendNumber('0')">0</button>
+    <button class="button" onclick="appendNumber('.')">.</button>
   </div>
 </div>
 
 <script>
-  // JavaScript to handle image navigation
-  const images = [
-    "https://via.placeholder.com/700x400?text=Image+1",
-    "https://via.placeholder.com/700x400?text=Image+2",
-    "https://via.placeholder.com/700x400?text=Image+3",
-    "https://via.placeholder.com/700x400?text=Image+4",
-    "https://via.placeholder.com/700x400?text=Image+5"
-  ];
+  let displayElement = document.getElementById("display");
+  let currentInput = "0";
+  let operator = "";
+  let previousInput = "";
 
-  let currentIndex = 0;
-
-  function updateMainImage(index) {
-    const mainImage = document.getElementById("mainImage");
-    mainImage.src = images[index];
-    updateThumbnails(index);
+  // Display helper functions
+  function updateDisplay(value) {
+    displayElement.innerText = value;
   }
 
-  function updateThumbnails(index) {
-    const thumbnails = document.querySelectorAll(".thumbnail");
-    thumbnails.forEach((thumb, i) => {
-      thumb.classList.toggle("active", i === index);
-    });
+  function clearDisplay() {
+    currentInput = "0";
+    operator = "";
+    previousInput = "";
+    updateDisplay(currentInput);
   }
 
-  function nextImage() {
-    currentIndex = (currentIndex + 1) % images.length;
-    updateMainImage(currentIndex);
+  function appendNumber(number) {
+    if (currentInput === "0") {
+      currentInput = number;
+    } else {
+      currentInput += number;
+    }
+    updateDisplay(currentInput);
   }
 
-  function prevImage() {
-    currentIndex = (currentIndex - 1 + images.length) % images.length;
-    updateMainImage(currentIndex);
+  function appendOperator(op) {
+    if (currentInput === "") return;
+    if (operator !== "") {
+      calculate();
+    }
+    operator = op;
+    previousInput = currentInput;
+    currentInput = "";
   }
 
-  function setImage(index) {
-    currentIndex = index;
-    updateMainImage(index);
-  }
+  function calculate() {
+    let result;
+    const prev = parseFloat(previousInput);
+    const current = parseFloat(currentInput);
 
-  // Initialize gallery
-  updateMainImage(currentIndex);
+    if (isNaN(prev) || isNaN(current)) return;
+
+    switch (operator) {
+      case "+":
+        result = prev + current;
+        break;
+      case "-":
+        result = prev - current;
+        break;
+      case "*":
+        result = prev * current;
+        break;
+      case "/":
+        result = prev / current;
+        break;
+      default:
+        return;
+    }
+
+    currentInput = result.toString();
+    operator = "";
+    previousInput = "";
+    updateDisplay(currentInput);
+  }
 </script>
 
 </body>
